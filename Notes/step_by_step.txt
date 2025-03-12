@@ -1,0 +1,267 @@
+🚀 Step-by-Step Guide to Creating & Deploying the Holi Date Finder Web App
+
+This guide covers the entire process of building, coding, deploying, and hosting a Flask-based Holi Date Finder web app on Render.
+
+-------------------------------------------------------------------------------
+📌 1. Setting Up the Project
+
+Before writing code, let’s set up the folder structure and install necessary tools.
+
+✅ Install Required Tools
+	1.	Python: Download and install from python.org
+	2.	Git: Install from git-scm.com
+	3.	A Code Editor: Use VS Code, PyCharm, or any preferred editor.
+
+✅ Create the Project Directory
+
+Open a terminal and run:
+
+mkdir holi-flask
+cd holi-flask
+
+This creates a folder called holi-flask, where all project files will be stored.
+
+-------------------------------------------------------------------------------
+
+📌 2. Creating the HTML File
+
+This is the frontend that allows users to select a year and see the Holi date.
+
+✅ Create the templates/ Folder
+mkdir templates
+
+Flask requires HTML files to be stored inside a templates/ folder.
+
+✅ Create holi.html
+
+Inside templates/, create a new file holi.html and paste the following:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Holi Date Finder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        select {
+            padding: 10px;
+            font-size: 16px;
+        }
+        h2 {
+            margin-top: 20px;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>   
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Holi Date Finder</h1>
+
+        <form action="/" method="POST">
+            <label for="year"><strong>Select Year:</strong></label>
+            <select id="year" name="year">
+                <option value="">-- Select Year --</option>
+                {% for year in range(1950, 2051) %}
+                    <option value="{{ year }}">{{ year }}</option>
+                {% endfor %}
+            </select>
+
+            <br><br>
+            <input type="submit" value="Find Holi Date">
+        </form>
+
+        <h2>Holi Falls on: <span>{{ holi_date }}</span></h2>
+    </div>
+
+</body>
+</html>
+
+
+-------------------------------------------------------------------------------
+
+📌 3. Creating the Python Backend
+
+✅ Install Flask and Required Packages
+
+Run:
+pip install flask ephem gunicorn
+
+✅ Create app.py
+
+Inside your holi-flask/ directory, create app.py and paste:
+
+from flask import Flask, render_template, request
+import ephem
+from datetime import datetime
+
+app = Flask(__name__)
+
+def calculate_holi_date(year):
+    """
+    Finds the correct Holi date based on the full moon in Phalguna month.
+    """
+    # Get the full moons in February, March, and April
+    feb_full_moon = ephem.previous_full_moon(f"{year}/3/1")
+    march_full_moon = ephem.next_full_moon(f"{year}/3/1")
+    april_full_moon = ephem.next_full_moon(f"{year}/4/1")
+
+    # Convert dates to readable format
+    feb_date = datetime.strptime(str(feb_full_moon), "%Y/%m/%d %H:%M:%S")
+    march_date = datetime.strptime(str(march_full_moon), "%Y/%m/%d %H:%M:%S")
+    april_date = datetime.strptime(str(april_full_moon), "%Y/%m/%d %H:%M:%S")
+
+    # Check where Phalguna Purnima falls
+    if feb_date.month == 2 and feb_date.day > 20:
+        return feb_date.strftime("%B %d, %Y")
+    elif march_date.month == 3:
+        return march_date.strftime("%B %d, %Y")
+    else:
+        return april_date.strftime("%B %d, %Y")
+
+@app.route("/", methods=["GET", "POST"])
+def index():
+    holi_date = ""
+    if request.method == "POST":
+        year = request.form.get("year")
+        if year:
+            holi_date = calculate_holi_date(int(year))
+    return render_template("holi.html", holi_date=holi_date)
+
+if __name__ == "__main__":
+    app.run(debug=True)
+    
+
+-------------------------------------------------------------------------------
+
+📌 4. Setting Up Git and Pushing to GitHub
+
+✅ Initialize Git
+git init
+
+✅ Create requirements.txt
+
+Run:
+pip freeze > requirements.txt
+
+Or manually create requirements.txt:
+flask
+gunicorn
+ephem
+
+✅ Create Procfile
+
+Render requires a Procfile to know how to run your app.
+
+Create Procfile (without any extension) and add:
+web: gunicorn app:app
+
+✅ Commit & Push to GitHub
+git add .
+git commit -m "Initial commit for Holi Flask app"
+git branch -M main
+git remote add origin https://github.com/YOUR_USERNAME/holi-flask.git
+git push -u origin main
+
+-------------------------------------------------------------------------------
+
+📌 5. Deploying on Render
+
+✅ Deploy on Render
+	1.	Go to 👉 https://render.com/
+	2.	Sign up (GitHub login recommended).
+	3.	Click “New Web Service”.
+	4.	Select your GitHub repository (holi-flask).
+	5.	Set up:
+	•	Runtime: Python 3.x
+	•	Build Command: pip install -r requirements.txt
+	•	Start Command: gunicorn app:app
+	6.	Click Deploy.
+
+✅ Get Your Live App URL
+
+After deployment, Render gives you a live URL like:
+https://holi-flask.onrender.com/
+
+Open the link to see your app in action! 🎉
+
+-------------------------------------------------------------------------------
+
+📌 6. Folder Structure
+/holi-flask
+├── app.py              # Python backend
+├── requirements.txt    # Dependencies
+├── Procfile            # Deployment instructions for Render
+├── templates/          # HTML files
+│   ├── holi.html       # Main webpage
+
+
+-------------------------------------------------------------------------------
+
+🚀 Final Summary
+Step
+What We Did
+1. Set Up
+Created a Flask project, installed dependencies
+2. HTML File
+Designed a form with a year dropdown
+3. Python Backend
+Used Flask + ephem to calculate Holi
+4. GitHub Setup
+Pushed the project to GitHub
+5. Deployment
+Hosted it on Render
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
