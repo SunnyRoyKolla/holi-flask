@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Holi Date Finder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        select {
+            padding: 10px;
+            font-size: 16px;
+        }
+        h2 {
+            margin-top: 20px;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>   
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Holi Date Finder</h1>
+
+        <form action="/" method="POST">
+            <label for="year"><strong>Select Year:</strong></label>
+            <select id="year" name="year">
+                <option value="">-- Select Year --</option>
+                {% for year in range(1950, 2051) %}
+                    <option value="{{ year }}">{{ year }}</option>
+                {% endfor %}
+            </select>
+
+            <br><br>
+            <input type="submit" value="Find Holi Date">
+        </form>
+
+        <h2>Holi Falls on: <span>{{ holi_date }}</span></h2>
+    </div>
+
+</body>
+</html>
